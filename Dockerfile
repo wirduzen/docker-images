@@ -13,6 +13,9 @@ ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/relea
 
 RUN install-php-extensions gd intl pdo_mysql zip
 
+RUN  DEBIAN_FRONTEND=noninteractive && \
+    apt-get update && \
+    apt-get install -y openssh-client rsync jq
 
 RUN cd /opt && \
     if [ "$TARGETARCH" = "arm64" ]; then TARGETARCH="arm64"; else TARGETARCH="x64"; fi && \
