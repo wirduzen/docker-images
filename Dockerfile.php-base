@@ -11,11 +11,11 @@ COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
-RUN install-php-extensions gd intl pdo_mysql zip
-
 RUN  DEBIAN_FRONTEND=noninteractive && \
     apt-get update && \
-    apt-get install -y openssh-client rsync jq
+    apt-get install -y openssh-client rsync jq git
+
+RUN install-php-extensions gd intl pdo_mysql zip
 
 RUN cd /opt && \
     if [ "$TARGETARCH" = "arm64" ]; then TARGETARCH="arm64"; else TARGETARCH="x64"; fi && \
