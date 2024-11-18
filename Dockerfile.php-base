@@ -8,6 +8,7 @@ ARG TARGETOS TARGETARCH
 ARG NODE_VERSION=22.11.0
 
 COPY --from=composer /usr/bin/composer /usr/bin/composer
+COPY --from=ghcr.io/friendsofshopware/shopware-cli /usr/local/bin/shopware-cli /usr/local/bin/shopware-cli
 
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
