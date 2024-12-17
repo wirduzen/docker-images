@@ -1,14 +1,26 @@
 ARG PHP_VERSION=8.2
 ARG COMPOSER_VERSION=2.4
 
-FROM composer:${COMPOSER_VERSION} AS composer
+FROM golang:1.23-bookworm as build-step
+
+ARG TARGETOS TARGETARCH
+ENV GOOS=${TARGETOS}
+ENV GOARCH=${TARGETARCH}
+
+RUN apt-get update && apt-get install -y git
+RUN git clone "https://github.com/schneider-felix/shopware-cli.git" && \
+    cd shopware-cli && \
+    git switch "felix/skip-node-modules-cleanup" && \
+    go build -o /usr/local/bin/shopware-cli
+
+FROM composer:${COMPOSER_VERSION} as composer
 FROM php:${PHP_VERSION}-cli
 
 ARG TARGETOS TARGETARCH
 ARG NODE_VERSION=22.11.0
 
 COPY --from=composer /usr/bin/composer /usr/bin/composer
-COPY --from=ghcr.io/friendsofshopware/shopware-cli /usr/local/bin/shopware-cli /usr/local/bin/shopware-cli
+COPY --from=build-step /usr/local/bin/shopware-cli /usr/local/bin/shopware-cli
 
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
