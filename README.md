@@ -9,6 +9,7 @@ The images include the following software:
 - PHP
 - Composer
 - NodeJS (and NPM)
+- Shopware-CLI
 
 ## Build Args
 
