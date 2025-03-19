@@ -1,7 +1,7 @@
 name: Create and publish PHP base Docker image
 on:
   push:
-    branches: ['release']
+    branches: ['main']
 
 env:
   REGISTRY: ghcr.io
