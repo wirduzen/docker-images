@@ -8,7 +8,7 @@ RUN DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
     && apt-get install -y git
 
-RUN git clone -b 'fix/force-admin-build' --single-branch git@github.com:schneider-felix/shopware-cli.git \
+RUN git clone -b 'fix/force-admin-build' --single-branch https://github.com/schneider-felix/shopware-cli.git \
     && cd shopware-cli \
     && go build -o shopware-cli \
     && mv shopware-cli /shopware-cli
