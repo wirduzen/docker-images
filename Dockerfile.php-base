@@ -2,13 +2,15 @@ ARG PHP_VERSION=8.2
 ARG COMPOSER_VERSION=2.4
 ARG SHOPWARE_CLI_VERSION=0.8.3
 
+FROM ghcr.io/shopware/shopware-cli:bin-${SHOPWARE_CLI_VERSION} AS shopware-cli
+FROM composer:${COMPOSER_VERSION} AS composer
 FROM php:${PHP_VERSION}-cli
 
 ARG TARGETOS TARGETARCH
 ARG NODE_VERSION=22.11.0
 
-COPY --from=composer:${COMPOSER_VERSION} /usr/bin/composer /usr/bin/composer
-COPY --from=ghcr.io/shopware/shopware-cli:bin-${SHOPWARE_CLI_VERSION} /shopware-cli /usr/local/bin/shopware-cli
+COPY --from=composer /usr/bin/composer /usr/bin/composer
+COPY --from=shopware-cli /shopware-cli /usr/local/bin/shopware-cli
 
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
