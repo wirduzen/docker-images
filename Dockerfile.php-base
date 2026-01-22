@@ -28,7 +28,7 @@ RUN  DEBIAN_FRONTEND=noninteractive && \
     apt-get update && \
     apt-get install -y openssh-client rsync jq git
 
-RUN install-php-extensions gd intl pdo_mysql zip amqp redis ffi soap
+RUN install-php-extensions gd intl pdo_mysql zip amqp redis ffi soap sockets
 
 COPY ./php-base/wirduzen.ini /usr/local/etc/php/conf.d/wirduzen.ini
 
