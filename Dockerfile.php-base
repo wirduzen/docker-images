@@ -5,7 +5,7 @@ ARG NODE_VERSION=22.11.0
 
 FROM ghcr.io/shopware/shopware-cli:bin-${SHOPWARE_CLI_VERSION} AS shopware-cli
 FROM composer:${COMPOSER_VERSION} AS composer
-FROM node:${NODE_VERSION}-alpine AS node
+FROM node:${NODE_VERSION} AS node
 FROM php:${PHP_VERSION}-cli
 
 COPY --link --from=composer /usr/bin/composer /usr/bin/composer
