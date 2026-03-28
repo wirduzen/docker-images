@@ -1,16 +1,26 @@
 ARG PHP_VERSION=8.2
 ARG COMPOSER_VERSION=2.4
 ARG SHOPWARE_CLI_VERSION=0.14.3
+ARG NODE_VERSION=22.11.0
 
 FROM ghcr.io/shopware/shopware-cli:bin-${SHOPWARE_CLI_VERSION} AS shopware-cli
 FROM composer:${COMPOSER_VERSION} AS composer
+FROM node:${NODE_VERSION}-alpine AS node
 FROM php:${PHP_VERSION}-cli
 
-ARG TARGETOS TARGETARCH
-ARG NODE_VERSION=22.11.0
+COPY --link --from=composer /usr/bin/composer /usr/bin/composer
+COPY --link --from=shopware-cli /shopware-cli /usr/local/bin/shopware-cli
+COPY --link --from=node /usr/local/bin/node /usr/local/bin/node
+COPY --link --from=node /usr/local/lib/node_modules /usr/local/lib/node_modules
 
-COPY --from=composer /usr/bin/composer /usr/bin/composer
-COPY --from=shopware-cli /shopware-cli /usr/local/bin/shopware-cli
+RUN <<EOF
+    set -e
+
+    ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm
+    ln -s /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx
+    ln -s /usr/local/lib/node_modules/corepack/dist/corepack.js /usr/local/bin/corepack
+EOF
+
 
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
@@ -21,16 +31,6 @@ RUN  DEBIAN_FRONTEND=noninteractive && \
 RUN install-php-extensions gd intl pdo_mysql zip amqp redis ffi soap sockets
 
 COPY ./php-base/wirduzen.ini /usr/local/etc/php/conf.d/wirduzen.ini
-
-RUN cd /opt && \
-    if [ "$TARGETARCH" = "arm64" ]; then TARGETARCH="arm64"; else TARGETARCH="x64"; fi && \
-    curl -LO "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-${TARGETOS}-${TARGETARCH}.tar.xz" && \
-    tar -xJf "node-v${NODE_VERSION}-${TARGETOS}-${TARGETARCH}.tar.xz" && \
-    rm "node-v${NODE_VERSION}-${TARGETOS}-${TARGETARCH}.tar.xz" && \
-    ln -s "/opt/node-v${NODE_VERSION}-${TARGETOS}-${TARGETARCH}/bin/node" /usr/local/bin/node && \
-    ln -s "/opt/node-v${NODE_VERSION}-${TARGETOS}-${TARGETARCH}/bin/npm" /usr/local/bin/npm && \
-    ln -s "/opt/node-v${NODE_VERSION}-${TARGETOS}-${TARGETARCH}/bin/npx" /usr/local/bin/npx && \
-    ln -s "/opt/node-v${NODE_VERSION}-${TARGETOS}-${TARGETARCH}/bin/corepack" /usr/local/bin/corepack
 
 RUN mkdir /app
 
